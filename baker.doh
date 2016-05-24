@@ -1,9 +1,9 @@
 {
     "essexeld.c.includeDirectories": [
-        "../sxe/libsxe/build-linux-64-release/include"
+        "../sxe/libsxe/build-linux-64-debug/include"
     ],
     "essexeld.objectFiles": [
-        "../sxe/libsxe/build-linux-64-release/libsxe.a"
+        "../sxe/libsxe/build-linux-64-debug/libsxe.a"
     ],
     "preferredIncludeDirExps": [
         ".*/include$"

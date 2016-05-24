@@ -14,7 +14,7 @@ Dependencies
 sxe
 ---
 
-**essexeld** requires the latest version of **libsxe**:
+**essexeld** requires the *latest* version of **libsxe**:
 
   1. Run: `git clone https://github.com/jimbelton/sxe`
   2. Run: `cd sxe`
