@@ -1,4 +1,5 @@
 #include "sxe-httpd.h"
+#include "lib-proto.h"
 
 static char     urlPrefix[]  = "/urlinfo/1/";
 static unsigned urlPrefixLen = 11;
@@ -16,6 +17,7 @@ essexld_http_request(SXE_HTTPD_REQUEST * request, const char * method, unsigned 
                      const char * url, unsigned urlLen, const char * version, unsigned versionLen)
 {
     SXE_RETURN result = SXE_RETURN_ERROR_BAD_MESSAGE;
+    char *     response;
 
     SXEE98I("%s(request=%p,method='%.*s',url='%.*s',version='%.*s')", __func__,
             request, methodLen, method, urlLen, url, versionLen, version);
@@ -25,18 +27,22 @@ essexld_http_request(SXE_HTTPD_REQUEST * request, const char * method, unsigned 
     if (methodLen != 3 || strncmp(method, "GET", 3) != 0) {
         sxe_httpd_response_simple(request, 400, "Bad request", "Invalid method. Essexeld only supports GET",
                                   HTTPD_CONNECTION_CLOSE_HEADER, HTTPD_CONNECTION_CLOSE_VALUE, NULL);
-        goto SXE_EARLY_OUT;
     }
-
-    if (urlLen < urlPrefixLen || strncmp(url, urlPrefix, urlPrefixLen) != 0) {
+    else if (urlLen < urlPrefixLen || strncmp(url, urlPrefix, urlPrefixLen) != 0) {
         sxe_httpd_response_simple(request, 400, "Bad request", "Invalid URL. Must start with /urlinfo/1/",
                                   HTTPD_CONNECTION_CLOSE_HEADER, HTTPD_CONNECTION_CLOSE_VALUE, NULL);
-        goto SXE_EARLY_OUT;
+    }
+    else {
+        result = SXE_RETURN_OK;
+
+        if ((response = essexeldCheckUrl(&url[urlPrefixLen], urlLen - urlPrefixLen)) == NULL) {
+            sxe_httpd_response_simple(request, 404, "Not found", "URL not found", NULL);
+        }
+        else {
+            sxe_httpd_response_simple(request, 200, "OK", response, NULL);
+        }
     }
 
-    result = SXE_RETURN_OK;
-
-SXE_EARLY_OUT:
     SXER81I("return result=%s", sxe_return_to_string(result));
     return result;
 }
@@ -55,6 +61,7 @@ main(int argc, char ** argv)
     sxe_httpd_set_request_handler(&httpd, essexld_http_request);
     sxePtr = sxe_httpd_listen(&httpd, "127.0.0.1", 8080);
     ev_loop(ev_default_loop(0), 0);
+    SXEL20("I've fallen out me loop!");
     sxe_close(sxePtr);
     sxe_fini();
     return 0;
