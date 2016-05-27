@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "lib.h"
 //#include "sxe-util.h"
@@ -16,7 +17,9 @@
 
 const char *
 essexeldUrlCheck(const char * url, unsigned urlLen) {
-    (void)url;
-    (void)urlLen;
+    if (strncmp("whitehouse.com", url, urlLen) == 0) {
+        return "porn";
+    }
+
     return NULL;
 }
