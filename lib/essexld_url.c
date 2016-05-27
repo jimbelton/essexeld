@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "lib.h"
+#include "sxe-http.h"
 //#include "sxe-util.h"
 //
 //struct DOMAIN {
@@ -16,9 +17,30 @@
 //}
 
 const char *
-essexeldUrlCheck(const char * url, unsigned urlLen) {
-    if (strncmp("whitehouse.com", url, urlLen) == 0) {
-        return "porn";
+essexeldUrlCheck(const char * urlString, unsigned urlLength) {
+    SXE_HTTP_URL url;
+    const char * hostString;
+    unsigned     hostLength;
+    const char * dot;
+
+    if (sxe_http_url_parse(&url, urlString, urlLength, SXE_HTTP_URL_OPTION_NOSCHEME) != SXE_RETURN_OK) {
+        return NULL;
+    }
+
+    hostString = url.host;
+    hostLength = url.host_length;
+
+    for (;;) {
+        if (strncmp("whitehouse.com", hostString, hostLength) == 0) {
+            return "porn";
+        }
+
+        if (hostLength < 4 || (dot = memchr(hostString, '.', hostLength)) == NULL) {
+            break;
+        }
+
+        hostLength -= (dot - hostString) + 1;
+        hostString  = dot + 1;
     }
 
     return NULL;

@@ -8,7 +8,7 @@ extern "C" {
 
 //}
 
-const char * essexeldUrlCheck(const char * url, unsigned urlLen) ;
+const char * essexeldUrlCheck(const char * urlString, unsigned urlLength) ;
 void MD5_Init(MD5_CTX *ctx) ;
 void MD5_Update(MD5_CTX *ctx, const void *data, unsigned long size) ;
 void MD5_Final(unsigned char *result, MD5_CTX *ctx) ;
