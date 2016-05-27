@@ -1,5 +1,5 @@
 #include "sxe-httpd.h"
-#include "lib-proto.h"
+#include "lib.h"
 
 static char     urlPrefix[]  = "/urlinfo/1/";
 static unsigned urlPrefixLen = 11;
@@ -51,9 +51,9 @@ essexld_http_request(SXE_HTTPD_REQUEST * request, const char * method, unsigned 
 static void
 essexld_http_respond(struct SXE_HTTPD_REQUEST * request)
 {
-    char * response;
+    const char * response;
 
-    if ((response = essexeldCheckUrl(&request->url[urlPrefixLen], request->url_length - urlPrefixLen)) == NULL) {
+    if ((response = essexeldUrlCheck(&request->url[urlPrefixLen], request->url_length - urlPrefixLen)) == NULL) {
         sxe_httpd_response_simple(request, 404, "Not found", "URL not found", NULL);
     }
     else {
