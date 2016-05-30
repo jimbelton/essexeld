@@ -8,7 +8,9 @@
 
 int
 main(int argc, char ** argv) {
-    bool     dumpFlag = false;
+    bool     dumpFlag   = false;
+    char *   filterFile = NULL;
+    bool     printFlag  = false;
     FILE *   blacklist;
     char *   line;
     char     lineBuffer[1024];
@@ -21,6 +23,15 @@ main(int argc, char ** argv) {
         if (strcmp(argv[1], "-d") == 0) {
             dumpFlag = true;
         }
+        else if (strcmp(argv[1], "-f") == 0) {
+            filterFile = argv[2];
+            argv[1] = argv[0];
+            argv++;
+            argc--;
+        }
+        else if (strcmp(argv[1], "-p") == 0) {
+            printFlag = true;
+        }
         else {
             break;
         }
@@ -31,14 +42,21 @@ main(int argc, char ** argv) {
     }
 
     if (argc != 2) {
-        fprintf(stderr, "usage: %s [-d] <file-name> - Output a sorted list of MD5s of the URLs in the file\n"
-                        "    -d  Instead, dump an output file in hexadecimal", argv[0]);
+        fprintf(stderr, "usage: %s [-d] [-f <domain-md5s>] [-p] <file-name> - Output a sorted list of MD5s of the URLs in the file\n"
+                        "    -d       Instead, dump an output file in hexadecimal (not yet implemented)\n"
+                        "    -f file  Filter URLs, removing those whose domain names are in the file of MD5s\n"
+                        "    -p       Print URLs rather than their MD5s\n",
+                argv[0]);
         exit(1);
     }
 
     if (dumpFlag) {
         fprintf(stderr, "Dump feature is not yet implemented\n");
         exit(1);
+    }
+
+    if (filterFile) {
+        essexeldUrlInit(filterFile, NULL);
     }
 
     if ((blacklist = fopen(argv[1], "r")) == NULL) {
@@ -53,6 +71,19 @@ main(int argc, char ** argv) {
     while ((line = fgets(lineBuffer, sizeof(lineBuffer), blacklist)) != NULL) {
         unsigned len;
 
+        if (line[(len = strlen(line)) - 1] == '\n') {
+            len--;
+        }
+
+        if (filterFile && essexeldUrlCheck(line, len)) {
+            continue;
+        }
+
+        if (printFlag) {
+            puts(line);
+            continue;
+        }
+
         if (md5Num == md5Max) {
             md5Max <<= 1;
             md5s     = realloc(md5s, md5Max * sizeof(MD5));
@@ -60,10 +91,6 @@ main(int argc, char ** argv) {
             if (md5s == NULL) {
                 exit(1);
             }
-        }
-
-        if (line[(len = strlen(line)) - 1] == '\n') {
-            len--;
         }
 
         MD5_Init(&md5Factory);
@@ -75,6 +102,10 @@ main(int argc, char ** argv) {
     if (ferror(blacklist) != 0) {
         fprintf(stderr, "%s: Error %s reading file '%s'\n", argv[0], strerror(ferror(blacklist)), argv[1]);
         exit(1);
+    }
+
+    if (printFlag) {
+        exit(0);
     }
 
     qsort(md5s, md5Num, sizeof(MD5), (__compar_fn_t)md5Compare);

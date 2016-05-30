@@ -77,7 +77,7 @@ main(int argc, char ** argv)
     sxe_httpd_set_request_handler(&httpd, essexld_http_request);
     sxe_httpd_set_respond_handler(&httpd, essexld_http_respond);
     sxePtr = sxe_httpd_listen(&httpd, "127.0.0.1", 8080);
-    essexeldUrlInit("data/domains");
+    essexeldUrlInit("data/domains", "data/urls");
     ev_loop(ev_default_loop(0), 0);
     SXEL20("I've fallen out me loop!");
     sxe_close(sxePtr);

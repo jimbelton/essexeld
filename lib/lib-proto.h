@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-void essexeldUrlInit(const char * domainFile) ;
+void essexeldUrlInit(const char * domainFile, const char * urlFile) ;
 const char * essexeldUrlCheck(char * urlString, unsigned urlLength) ;
 void MD5_Init(MD5_CTX *ctx) ;
 void MD5_Update(MD5_CTX *ctx, const void *data, unsigned long size) ;
