@@ -80,7 +80,7 @@ main(int argc, char ** argv) {
         }
 
         if (printFlag) {
-            puts(line);
+            fputs(line, stdout);
             continue;
         }
 
