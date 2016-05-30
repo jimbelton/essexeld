@@ -26,7 +26,7 @@ essexld_http_request(SXE_HTTPD_REQUEST * request, const char * method, unsigned 
     (void)versionLen;
 
     if (methodLen != 3 || strncmp(method, "GET", 3) != 0) {
-        sxe_httpd_response_simple(request, 400, "Bad request", "Invalid method. Essexeld only supports GET",
+        sxe_httpd_response_simple(request, 405, "Bad request", "Invalid method. Essexeld only supports GET",
                                   HTTPD_CONNECTION_CLOSE_HEADER, HTTPD_CONNECTION_CLOSE_VALUE, NULL);
     }
     else if (urlLen < urlPrefixLen || strncmp(url, urlPrefix, urlPrefixLen) != 0) {
