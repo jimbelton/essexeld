@@ -14,7 +14,7 @@ Dependencies
 sxe
 ---
 
-**essexeld** requires the *latest* version of **libsxe**:
+**essexeld** requires the *latest* version of **sxe**:
 
   1. Run: `git clone https://github.com/jimbelton/sxe`
   2. Run: `cd sxe`
@@ -23,7 +23,8 @@ sxe
 baker
 -----
 
-**essexeld** can be built using my experimental **baker** build tool:
+**essexeld** can be built using the latest version of my experimental **baker** 
+build tool:
   1. Run:  `git clone https://github.com/jimbelton/baker`
   2. Add the **baker** directory to your path if desired
 
@@ -35,4 +36,16 @@ To build, simple run: `baker`
 Testing
 =======
 
-Tests are written in python. Run: `test/essexeld.py`
+Functional tests are written in python. Run: `test/essexeld.py`
+
+Unit tests for the URL lookup library are in C (using tap, part of sxe)
+To build all code and run the unit tests, run: `baker -t`
+To manually run the unit tests, run: `test\target\test_essexeld_url`
+
+Data
+====
+
+Note that the unit tests now use a domain table **data/domains**. This table was
+generated from the MESD blacklist's porn domain list using the utility program
+**util/target/essexeld_blacklist**. The generated table is a sorted list of MD5
+checksums.
