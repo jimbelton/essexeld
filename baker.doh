@@ -4,8 +4,8 @@
         "../sxe/libsxe/build-linux-64-debug/include"
     ],
     "essexeld.objectFiles": [
-        "../sxe/libsxe/build-linux-64-debug/libsxe.a",
-        "lib/target/lib.a"
+        "lib/target/lib.a",
+        "../sxe/libsxe/build-linux-64-debug/libsxe.a"
     ],
     "preferredIncludeDirExps": [
         ".*/include$"

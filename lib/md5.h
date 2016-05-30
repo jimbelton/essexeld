@@ -38,4 +38,8 @@ typedef struct {
     MD5_u32plus block[16];
 } MD5_CTX;
 
+typedef struct MD5_STRUCT {
+    unsigned char bytes[16];
+} MD5;
+
 #endif

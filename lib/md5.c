@@ -242,7 +242,7 @@ void MD5_Update(MD5_CTX *ctx, const void *data, unsigned long size)
     memcpy(ctx->buffer, data, size);
 }
 
-void MD5_Final(unsigned char *result, MD5_CTX *ctx)
+void MD5_Final(MD5 * result, MD5_CTX *ctx)
 {
     unsigned long used, available;
 
@@ -273,24 +273,30 @@ void MD5_Final(unsigned char *result, MD5_CTX *ctx)
 
     body(ctx, ctx->buffer, 64);
 
-    result[0] = ctx->a;
-    result[1] = ctx->a >> 8;
-    result[2] = ctx->a >> 16;
-    result[3] = ctx->a >> 24;
-    result[4] = ctx->b;
-    result[5] = ctx->b >> 8;
-    result[6] = ctx->b >> 16;
-    result[7] = ctx->b >> 24;
-    result[8] = ctx->c;
-    result[9] = ctx->c >> 8;
-    result[10] = ctx->c >> 16;
-    result[11] = ctx->c >> 24;
-    result[12] = ctx->d;
-    result[13] = ctx->d >> 8;
-    result[14] = ctx->d >> 16;
-    result[15] = ctx->d >> 24;
+    result->bytes[ 0] = ctx->a;
+    result->bytes[ 1] = ctx->a >> 8;
+    result->bytes[ 2] = ctx->a >> 16;
+    result->bytes[ 3] = ctx->a >> 24;
+    result->bytes[ 4] = ctx->b;
+    result->bytes[ 5] = ctx->b >> 8;
+    result->bytes[ 6] = ctx->b >> 16;
+    result->bytes[ 7] = ctx->b >> 24;
+    result->bytes[ 8] = ctx->c;
+    result->bytes[ 9] = ctx->c >> 8;
+    result->bytes[10] = ctx->c >> 16;
+    result->bytes[11] = ctx->c >> 24;
+    result->bytes[12] = ctx->d;
+    result->bytes[13] = ctx->d >> 8;
+    result->bytes[14] = ctx->d >> 16;
+    result->bytes[15] = ctx->d >> 24;
 
     memset(ctx, 0, sizeof(*ctx));
+}
+
+int
+md5Compare(const MD5 * left, const MD5 * right)
+{
+    return memcmp(left, right, sizeof(MD5));
 }
 
 #endif

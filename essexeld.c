@@ -1,6 +1,8 @@
 #include "sxe-httpd.h"
 #include "lib.h"
 
+#define DECONST(type, pointer) ((type)(uintptr_t)(pointer))
+
 static char     urlPrefix[]  = "/urlinfo/1/";
 static unsigned urlPrefixLen = 11;
 
@@ -53,7 +55,7 @@ essexld_http_respond(struct SXE_HTTPD_REQUEST * request)
 {
     const char * response;
 
-    if ((response = essexeldUrlCheck(&request->url[urlPrefixLen], request->url_length - urlPrefixLen)) == NULL) {
+    if ((response = essexeldUrlCheck(DECONST(char *, &request->url[urlPrefixLen]), request->url_length - urlPrefixLen)) == NULL) {
         sxe_httpd_response_simple(request, 404, "Not found", "URL not found", NULL);
     }
     else {
@@ -75,6 +77,7 @@ main(int argc, char ** argv)
     sxe_httpd_set_request_handler(&httpd, essexld_http_request);
     sxe_httpd_set_respond_handler(&httpd, essexld_http_respond);
     sxePtr = sxe_httpd_listen(&httpd, "127.0.0.1", 8080);
+    essexeldUrlInit("data/domains");
     ev_loop(ev_default_loop(0), 0);
     SXEL20("I've fallen out me loop!");
     sxe_close(sxePtr);
