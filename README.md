@@ -51,3 +51,13 @@ generated from the MESD blacklist's porn domains and urls lists using the utilit
 checksums. To regenerate the tables, run the following commands:
   1. `util/target/essexeld_blacklist` *domains-file* > `data/domains`
   2. `util/target/essexeld_blacklist -f` `data/domains` *urls-file* > `data/urls`
+  
+Initial Benchmark
+=================
+
+The script **test/benchmark_essexeld.py** throws the 165719 URLs in the MESD blacklist porn urls list at the service. Running the benchmark on a single system (127.0.0.1):
+
+| SXE Build  | Total Time | URLs/s |
+| ---------- | ---------- | ------ |
+| debug      | 18420s     | 9      |
+| release    | 35s        | 4735   |
