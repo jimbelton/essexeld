@@ -3,37 +3,47 @@
 
 #define DECONST(type, pointer) ((type)(uintptr_t)(pointer))
 
-static char     urlPrefix[]  = "/urlinfo/1/";
-static unsigned urlPrefixLen = 11;
+static char     pathPrefix[]  = "urlinfo/1/";
+static unsigned pathPrefixLen = 10;
 
 /* Called when an HTTP requests request line has been recieved. The expected format is:
  * GET /urlinfo/1/{hostname_and_port}/{original_path_and_query_string}
  *
- * @param method    The HTTP method (e.g. GET)
- * @param methodLen The length of the method (e.g. 3)
+ * @param request       HTTP request object
+ * @param methodString  HTTP method (e.g. GET)
+ * @param methodLength  Length of the method (e.g. 3)
+ * @param urlString     HTTP url (e.g. http://127.0.0.1:8080/urlinfo/1/host.com/url)
+ * @param urlLength     Length of the url (e.g. 44)
+ * @param versionString HTTP version string
+ * @param versionLength Length of the version string
  *
- * @return 0 on success or a valid HTTP response code to immediately respond with (e.g. 405 for Method Not Allowed)
+ * @return SXE_RETURN_OK on success, SXE_RETURN_ERROR_BAD_MESSAGE (e.g. 405 for Method Not Allowed)
  */
 static SXE_RETURN
-essexld_http_request(SXE_HTTPD_REQUEST * request, const char * method, unsigned methodLen,
-                     const char * url, unsigned urlLen, const char * version, unsigned versionLen)
+essexld_http_request(SXE_HTTPD_REQUEST * request, const char * methodString, unsigned methodLength,
+                     const char * urlString, unsigned urlLength, const char * versionString, unsigned versionLength)
 {
-    SXE_RETURN result = SXE_RETURN_ERROR_BAD_MESSAGE;
+    SXE_RETURN   result = SXE_RETURN_ERROR_BAD_MESSAGE;
+    SXE_HTTP_URL url;
 
-    SXEE98I("%s(request=%p,method='%.*s',url='%.*s',version='%.*s')", __func__,
-            request, methodLen, method, urlLen, url, versionLen, version);
-    (void)version;
-    (void)versionLen;
+    SXEE98I("%s(request=%p,methodString='%.*s',url='%.*s',versionString='%.*s')", __func__,
+            request, methodLength, methodString, urlLength, urlString, versionLen, versionString);
+    (void)versionString;
+    (void)versionLength;
 
-    if (methodLen != 3 || strncmp(method, "GET", 3) != 0) {
+    if (methodLength != 3 || strncmp(methodString, "GET", 3) != 0) {
         sxe_httpd_response_simple(request, 405, "Bad request", "Invalid method. Essexeld only supports GET",
                                   HTTPD_CONNECTION_CLOSE_HEADER, HTTPD_CONNECTION_CLOSE_VALUE, NULL);
     }
-    else if (urlLen < urlPrefixLen || strncmp(url, urlPrefix, urlPrefixLen) != 0) {
-        sxe_httpd_response_simple(request, 400, "Bad request", "Invalid URL. Must start with /urlinfo/1/",
+    else if (sxe_http_url_parse(&url, urlString, urlLength, 0) != SXE_RETURN_OK
+          || url.path_length < pathPrefixLen || strncmp(url.path, pathPrefix, pathPrefixLen) != 0) {
+        fprintf(stderr, "Bad URL '%.*s'\n", url.path_length, url.path);
+        sxe_httpd_response_simple(request, 400, "Bad request", "Invalid URL. Path must start with /urlinfo/1/",
                                   HTTPD_CONNECTION_CLOSE_HEADER, HTTPD_CONNECTION_CLOSE_VALUE, NULL);
     }
     else {
+        request->user_data = DECONST(void *, essexeldUrlCheck(DECONST(char *, &url.path[pathPrefixLen]),
+                                                              url.path_length - pathPrefixLen));
         result = SXE_RETURN_OK;
     }
 
@@ -53,13 +63,11 @@ essexld_http_request(SXE_HTTPD_REQUEST * request, const char * method, unsigned 
 static void
 essexld_http_respond(struct SXE_HTTPD_REQUEST * request)
 {
-    const char * response;
-
-    if ((response = essexeldUrlCheck(DECONST(char *, &request->url[urlPrefixLen]), request->url_length - urlPrefixLen)) == NULL) {
+    if (request->user_data == NULL) {
         sxe_httpd_response_simple(request, 404, "Not found", "URL not found", NULL);
     }
     else {
-        sxe_httpd_response_simple(request, 200, "OK", response, NULL);
+        sxe_httpd_response_simple(request, 200, "OK", request->user_data, NULL);
     }
 }
 

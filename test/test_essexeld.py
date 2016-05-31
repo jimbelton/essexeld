@@ -34,7 +34,19 @@ class TestEssexel(unittest.TestCase):
         connection = httplib.HTTPConnection("127.0.0.1", 8080)
         connection.request("GET", "http://127.0.0.1:8080/index.html")
         response = connection.getresponse()
-        self.assertEqual(response.status, httplib.BAD_REQUEST)
+        self.assertEqual(response.status, httplib.BAD_REQUEST, "index.html -> " + str(response.status))
+
+    def testUnblockedUrl(self):
+        connection = httplib.HTTPConnection("127.0.0.1", 8080)
+        connection.request("GET", "http://127.0.0.1:8080/urlinfo/1/google.com");
+        response = connection.getresponse()
+        self.assertEqual(response.status, httplib.NOT_FOUND, "urlinfo/1/google.com -> " + str(response.status))
+
+    def testBlockedUrl(self):
+        connection = httplib.HTTPConnection("127.0.0.1", 8080)
+        connection.request("GET", "http://127.0.0.1:8080/urlinfo/1/Pornhub.com");
+        response = connection.getresponse()
+        self.assertEqual(response.status, httplib.OK, "urlinfo/1/Pornhub.com -> " + str(response.status))
 
 if __name__ == '__main__':
     unittest.main()
