@@ -3,8 +3,8 @@
 
 #define DECONST(type, pointer) ((type)(uintptr_t)(pointer))
 
-static char     pathPrefix[]  = "urlinfo/1/";
-static unsigned pathPrefixLen = 10;
+static char     pathPrefix[]  = "/urlinfo/1/";
+static unsigned pathPrefixLen = 11;
 
 /* Called when an HTTP requests request line has been recieved. The expected format is:
  * GET /urlinfo/1/{hostname_and_port}/{original_path_and_query_string}
@@ -24,26 +24,26 @@ essexld_http_request(SXE_HTTPD_REQUEST * request, const char * methodString, uns
                      const char * urlString, unsigned urlLength, const char * versionString, unsigned versionLength)
 {
     SXE_RETURN   result = SXE_RETURN_ERROR_BAD_MESSAGE;
-    SXE_HTTP_URL url;
 
     SXEE98I("%s(request=%p,methodString='%.*s',url='%.*s',versionString='%.*s')", __func__,
             request, methodLength, methodString, urlLength, urlString, versionLen, versionString);
     (void)versionString;
     (void)versionLength;
 
+//    fprintf(stderr, "url = '%.*s'\n", urlLength, urlString);
+
     if (methodLength != 3 || strncmp(methodString, "GET", 3) != 0) {
         sxe_httpd_response_simple(request, 405, "Bad request", "Invalid method. Essexeld only supports GET",
                                   HTTPD_CONNECTION_CLOSE_HEADER, HTTPD_CONNECTION_CLOSE_VALUE, NULL);
     }
-    else if (sxe_http_url_parse(&url, urlString, urlLength, 0) != SXE_RETURN_OK
-          || url.path_length < pathPrefixLen || strncmp(url.path, pathPrefix, pathPrefixLen) != 0) {
-        fprintf(stderr, "Bad URL '%.*s'\n", url.path_length, url.path);
+    else if (urlLength < pathPrefixLen || strncmp(urlString, pathPrefix, pathPrefixLen) != 0) {
+        fprintf(stderr, "Bad URL '%.*s'\n", urlLength, urlString);
         sxe_httpd_response_simple(request, 400, "Bad request", "Invalid URL. Path must start with /urlinfo/1/",
                                   HTTPD_CONNECTION_CLOSE_HEADER, HTTPD_CONNECTION_CLOSE_VALUE, NULL);
     }
     else {
-        request->user_data = DECONST(void *, essexeldUrlCheck(DECONST(char *, &url.path[pathPrefixLen]),
-                                                              url.path_length - pathPrefixLen));
+        request->user_data = DECONST(void *, essexeldUrlCheck(DECONST(char *, &urlString[pathPrefixLen]),
+                                                              urlLength - pathPrefixLen));
         result = SXE_RETURN_OK;
     }
 

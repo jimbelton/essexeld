@@ -23,15 +23,23 @@ with open(urlFile) as urlStream:
 process = subprocess.Popen([mainDir + "/target/essexeld"], stderr=open(logFile, "w"))
 time.sleep(1)
 connection = httplib.HTTPConnection("127.0.0.1", 8080)
-
-startTime = time.time()
+urlCount   = 0
+startTime  = time.time()
 
 for url in urls:
-    connection.request("GET", "http://127.0.0.1:8080/urlinfo/1/" + url)
-    response = connection.getresponse()
+    urlCount += 1
+    connection.connect()
+    connection.request("GET", "/urlinfo/1/" + url)
+
+    try:
+        response = connection.getresponse()
+    except httplib.ResponseNotReady:
+        print str(urlCount) + ": " + url
 
     if response.status != httplib.OK:
         print "%s not found (%d)" % (url, response.status)
+
+    connection.close()
 
 print "Total time: " + str(time.time() - startTime)
 process.terminate()

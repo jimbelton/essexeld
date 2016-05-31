@@ -26,27 +26,27 @@ class TestEssexel(unittest.TestCase):
 
     def testBadMethod(self):
         connection = httplib.HTTPConnection("127.0.0.1", 8080)
-        connection.request("POST", "http://127.0.0.1:8080/index.html")
+        connection.request("POST", "/index.html")
         response = connection.getresponse()
-        self.assertEqual(response.status, httplib.METHOD_NOT_ALLOWED)
+        self.assertEqual(response.status, httplib.METHOD_NOT_ALLOWED)    # PUT /index.html
 
     def testBadUrlPrefix(self):
         connection = httplib.HTTPConnection("127.0.0.1", 8080)
-        connection.request("GET", "http://127.0.0.1:8080/index.html")
+        connection.request("GET", "/index.html")
         response = connection.getresponse()
-        self.assertEqual(response.status, httplib.BAD_REQUEST, "index.html -> " + str(response.status))
+        self.assertEqual(response.status, httplib.BAD_REQUEST)    # GET /index.html
 
     def testUnblockedUrl(self):
         connection = httplib.HTTPConnection("127.0.0.1", 8080)
-        connection.request("GET", "http://127.0.0.1:8080/urlinfo/1/google.com");
+        connection.request("GET", "/urlinfo/1/google.com");
         response = connection.getresponse()
-        self.assertEqual(response.status, httplib.NOT_FOUND, "urlinfo/1/google.com -> " + str(response.status))
+        self.assertEqual(response.status, httplib.NOT_FOUND)    # GET /urlinfo/1/google.com
 
     def testBlockedUrl(self):
         connection = httplib.HTTPConnection("127.0.0.1", 8080)
-        connection.request("GET", "http://127.0.0.1:8080/urlinfo/1/Pornhub.com");
+        connection.request("GET", "/urlinfo/1/Pornhub.com");
         response = connection.getresponse()
-        self.assertEqual(response.status, httplib.OK, "urlinfo/1/Pornhub.com -> " + str(response.status))
+        self.assertEqual(response.status, httplib.OK)    # GET /urlinfo/1/Pornhub.com
 
 if __name__ == '__main__':
     unittest.main()
