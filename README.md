@@ -55,9 +55,23 @@ checksums. To regenerate the tables, run the following commands:
 Initial Benchmark
 =================
 
-The script **test/benchmark_essexeld.py** throws the 165719 URLs in the MESD blacklist porn urls list at the service. Running the benchmark on a single system (127.0.0.1):
+The script **test/benchmark_essexeld.py** throws the 165719 URLs in the MESD blacklist 
+porn urls list at the service. Running the benchmark on a single system (127.0.0.1):
 
 | SXE Build  | Total Time | URLs/s |
 | ---------- | ---------- | ------ |
 | debug      | 18420s     | 9      |
 | release    | 35s        | 4735   |
+
+Using the Server
+================
+
+The protocol for looking up the blacklist is simple. Issue an HTTP get request with
+the path string /urlinfo/1/host.name[:port][/query/string]. If the URL is not found,
+the server will respond with status code 404 (Not Found). If found, the server will
+respond with 200 (OK), and the body will contain the string "porn".
+
+Note: The server is currently hard coded to return the category "porn". It could
+easily be extended to support multiple categories, or even arbitrary response texts.
+The more complex the response, the more memory and CPU data cache will be required by the
+service.
