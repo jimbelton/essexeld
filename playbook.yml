@@ -1,0 +1,19 @@
+---
+- hosts: webservers
+  remote_user: ec2-user
+  become: yes
+  tasks:
+    - name: create directories
+      command: mkdir -p /opt/essexeld/bin /opt/essexeld/data /opt/essexeld/etc
+    - name: copy the server over
+      copy: src=target/essexeld dest=/opt/essexeld/bin/essexeld owner=root group=root mode=0744
+      notify:
+        - restart essexeld
+    - name: copy the domains over
+      copy: src=data/domains dest=/opt/essexeld/data/domains owner=root mode=644
+      notify:
+        - restart essexeld
+    - name: copy the urls over
+      copy: src=data/urls dest=/opt/essexeld/data/urls owner=root mode=644
+      notify:
+        - restart essexeld
