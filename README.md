@@ -31,7 +31,7 @@ build tool:
 Building
 ========
 
-To build, simple run: `baker`
+To build, simply run: `baker`
 
 Testing
 =======
@@ -62,6 +62,22 @@ porn urls list at the service. Running the benchmark on a single system (127.0.0
 | ---------- | ---------- | ------ |
 | debug      | 18420s     | 9      |
 | release    | 35s        | 4735   |
+
+Deploying amd Restarting the Server
+===================================
+
+The server can be deployed with ansible using the provided `playbook.yml` file. Create 
+a group named `[webservers]` in your `/etc/ansible/hosts` file that includes the hosts
+you want to deploy the server to, or create a group with a different name and modify
+`playbook.yml` to use that name. All servers must be accessible via ssh. To deploy,
+run:
+
+> ansible-playbook playbook.yml
+
+Currently, the script doesn't automatically restart the server. To restart the server,
+`ssh` in to each host, become the root user, and run: 
+
+> nohup /opt/essexeld/bin/essexld -p 80 &
 
 Using the Server
 ================
